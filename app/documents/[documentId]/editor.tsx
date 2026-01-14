@@ -5,6 +5,7 @@ import StarterKit from "@tiptap/starter-kit";
 import { TaskList, TaskItem } from "@tiptap/extension-list";
 import { TableKit } from "@tiptap/extension-table";
 import Image from "@tiptap/extension-image";
+import { TextStyleKit } from "@tiptap/extension-text-style";
 import { useEditorStore } from "@/store/use-editor-store";
 
 export const Editor = () => {
@@ -54,6 +55,7 @@ export const Editor = () => {
           alwaysPreserveAspectRatio: true,
         },
       }),
+      TextStyleKit,
     ],
     content: `
         <table>

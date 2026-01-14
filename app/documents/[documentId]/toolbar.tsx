@@ -1,16 +1,143 @@
 "use client";
 
 import React from "react";
-import { type LucideIcon, Undo2Icon, Redo2Icon, PrinterIcon, SpellCheckIcon, BoldIcon, ItalicIcon, UnderlineIcon, MessageSquareIcon, ListTodoIcon, RemoveFormattingIcon } from "lucide-react";
+import {
+  type LucideIcon,
+  Undo2Icon,
+  Redo2Icon,
+  PrinterIcon,
+  SpellCheckIcon,
+  BoldIcon,
+  ItalicIcon,
+  UnderlineIcon,
+  MessageSquareIcon,
+  ListTodoIcon,
+  RemoveFormattingIcon,
+  ChevronDownIcon,
+} from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import { useEditorStore } from "@/store/use-editor-store";
 import { Separator } from "@/components/ui/separator";
+import { Button } from "@/components/ui/button";
+import { type Level } from "@tiptap/extension-heading";
 
 interface ToolbarBtnProps {
   onClick?: () => void;
   isActive?: boolean;
   icon: LucideIcon;
 }
+
+const HeadingLevelBtn = () => {
+  const { editor } = useEditorStore();
+
+  const headings = [
+    { label: "Normal text", value: 0, fontSize: "16px" },
+    { label: "H1", value: 1, fontSize: "32px" },
+    { label: "H2", value: 2, fontSize: "24px" },
+    { label: "H3", value: 3, fontSize: "20px" },
+    { label: "H4", value: 4, fontSize: "18px" },
+    { label: "H5", value: 5, fontSize: "16px" },
+  ];
+
+  const getCurrentHeading = () => {
+    for (let level = 0; level <= 5; level++) {
+      if (editor?.isActive("heading", { level })) {
+        return `H${level}`;
+      }
+    }
+    return "Normal text";
+  };
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button
+          variant="outline"
+          className="h-7 min-w-7 shrink-0 flex items-center justify-center rounded-sm hover:bg-neutral-200/80"
+        >
+          <span className="truncate">{getCurrentHeading()}</span>
+          <ChevronDownIcon className="p-1 flex flex-col gap-y-1" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="p-1 flex flex-col gap-x-1">
+        {headings.map(({ label, value, fontSize }) => (
+          <DropdownMenuItem
+            key={value}
+            onClick={() => {
+              if (value === 0) {
+                editor?.chain().focus().setParagraph().run();
+              } else {
+                editor
+                  ?.chain()
+                  .focus()
+                  .toggleHeading({ level: value as Level })
+                  .run();
+              }
+            }}
+            className={cn(
+              "flex items-center gap-x-2 px-2 py-1 rounded-sm hover:bg-neutral-200/80",
+              (value === 0 && !editor?.isActive("heading")) ||
+                (editor?.isActive("heading", { level: value }) &&
+                  "bg-neutral-200/80")
+            )}
+            style={{ fontSize }}
+          >
+            {label}
+          </DropdownMenuItem>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+};
+
+const FontFamilyBtn = () => {
+  const { editor } = useEditorStore();
+  const fonts = [
+    { label: "Arial", value: "Arial" },
+    { label: "Times New Roman", value: "Times New Roman" },
+    { label: "Courier New", value: "Courier New" },
+    { label: "Georgia", value: "Georgia" },
+    { label: "Verdana", value: "Verdana" },
+  ];
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button
+          variant="outline"
+          className="h-7 w-[120px] shrink-0 flex items-center justify-between rounded-sm hover:bg-neutral-200/80 px-1.5 overflow-hidden text-sm"
+        >
+          <div className="truncate">
+            {editor?.getAttributes("textStyle").fontFamily || "Arial"}
+          </div>
+          <ChevronDownIcon className="p-1 flex flex-col gap-y-1" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="p-1 flex flex-col gap-x-1">
+        {fonts.map(({ label, value }) => (
+          <DropdownMenuItem
+            key={value}
+            style={{ fontFamily: value }}
+            onClick={() => editor?.chain().focus().setFontFamily(value).run()}
+            className={cn(
+              "flex items-center gap-x-2 px-2 py-1 rounded-sm hover:bg-neutral-200/80",
+              editor?.getAttributes("textStyle").fontFamily === value &&
+                "bg-neutral-200/80"
+            )}
+          >
+            <span className="text-sm">{label}</span>
+          </DropdownMenuItem>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+};
 
 const ToolbarBtn = ({ onClick, isActive, icon: Icon }: ToolbarBtnProps) => {
   return (
@@ -56,10 +183,14 @@ const Toolbar = () => {
         icon: SpellCheckIcon,
         onClick: () => {
           const current = editor?.view.dom.getAttribute("spellcheck");
-          editor?.view.dom.setAttribute("spellcheck", current === "false" ? "true" : "false");
+          editor?.view.dom.setAttribute(
+            "spellcheck",
+            current === "false" ? "true" : "false"
+          );
         },
       },
-    ],[
+    ],
+    [
       {
         label: "Bold",
         icon: BoldIcon,
@@ -78,11 +209,12 @@ const Toolbar = () => {
         onClick: () => editor?.chain().focus().toggleUnderline().run(),
         isActive: editor?.isActive("underline"),
       },
-    ], [
+    ],
+    [
       {
         label: "Comment",
         icon: MessageSquareIcon,
-        onClick: () => console.log('comment'),
+        onClick: () => console.log("comment"),
         isActive: false,
       },
       {
@@ -96,7 +228,7 @@ const Toolbar = () => {
         icon: RemoveFormattingIcon,
         onClick: () => editor?.chain().focus().unsetAllMarks().run(),
       },
-    ]
+    ],
   ];
 
   return (
@@ -107,6 +239,8 @@ const Toolbar = () => {
       <Separator orientation="vertical" className="h-6! bg-neutral-300" />
       <Separator orientation="vertical" className="h-6! bg-neutral-300" />
       <Separator orientation="vertical" className="h-6! bg-neutral-300" />
+      <FontFamilyBtn />
+      <HeadingLevelBtn />
       {/* TODO: Font family, heading, font size */}
       {sections[1].map((item) => (
         <ToolbarBtn key={item.label} {...item} />
