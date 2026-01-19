@@ -19,6 +19,12 @@ import {
   ImageIcon,
   UploadIcon,
   SearchIcon,
+  AlignLeftIcon,
+  AlignCenterIcon,
+  AlignRightIcon,
+  AlignJustifyIcon,
+  ListIcon,
+  ListOrderedIcon,
 } from "lucide-react";
 import {
   Dialog,
@@ -43,6 +49,7 @@ import { type Level } from "@tiptap/extension-heading";
 import { SketchPicker, type ColorResult } from "react-color";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import TextAlign from "@tiptap/extension-text-align";
 
 interface ToolbarBtnProps {
   onClick?: () => void;
@@ -312,6 +319,102 @@ const HighlightColorBtn = () => {
   );
 };
 
+const AlignBtn = () => {
+  const { editor } = useEditorStore();
+
+  const alignments = [
+    {
+      label: "Align left",
+      value: "left",
+      icon: AlignLeftIcon,
+    },
+    {
+      label: "Align center",
+      value: "center",
+      icon: AlignCenterIcon,
+    },
+    {
+      label: "Align right",
+      value: "right",
+      icon: AlignRightIcon,
+    },
+    {
+      label: "Align justify",
+      value: "justify ",
+      icon: AlignJustifyIcon,
+    },
+  ];
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <button className="h-7 min-w-7 shrink-0 flex flex-col gap-1 items-center justify-center rounded-sm hover:bg-neutral-200/80 px-1.5 overflow-hidden text-sm">
+          <AlignLeftIcon className="size-4" />
+        </button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="p-0 flex flex-col gap-y-1">
+        {alignments.map(({ label, value, icon: Icon }) => (
+          <button
+            key={value}
+            onClick={() => editor?.chain().focus().setTextAlign(value).run()}
+            className={cn(
+              "flex items-center gap-x-2 px-2 py-1 rounded-sm hover:bg-neutral-200/80",
+              editor?.isActive({ TextAlign: value }) && "bg-neutral-200/80"
+            )}
+          >
+            <Icon className="size-4" />
+            <span className="text-sm">{label}</span>
+          </button>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+};
+
+const ListBtn = () => {
+  const { editor } = useEditorStore();
+
+  const lists = [
+    {
+      label: "Bullet list",
+      icon: ListIcon,
+      isActive: () => editor?.isActive("bulletList"),
+      onClick: () => editor?.chain().focus().toggleBulletList().run(),
+    },
+    {
+      label: "Ordered list",
+      icon: ListOrderedIcon,
+      isActive: () => editor?.isActive("orderedList"),
+      onClick: () => editor?.chain().focus().toggleOrderedList().run(),
+    },
+  ];
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <button className="h-7 min-w-7 shrink-0 flex flex-col gap-1 items-center justify-center rounded-sm hover:bg-neutral-200/80 px-1.5 overflow-hidden text-sm">
+          <ListIcon className="size-4" />
+        </button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="p-0 flex flex-col gap-y-1">
+        {lists.map(({ label, onClick, isActive, icon: Icon }) => (
+          <button
+            key={label}
+            onClick={onClick}
+            className={cn(
+              "flex items-center gap-x-2 px-2 py-1 rounded-sm hover:bg-neutral-200/80",
+              isActive() && "bg-neutral-200/80"
+            )}
+          >
+            <Icon className="size-4" />
+            <span className="text-sm">{label}</span>
+          </button>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+};
+
 const ToolbarBtn = ({ onClick, isActive, icon: Icon }: ToolbarBtnProps) => {
   return (
     <button
@@ -423,6 +526,8 @@ const Toolbar = () => {
       <Separator orientation="vertical" className="h-6! bg-neutral-300" />
       <LinkBtn />
       <ImageBtn />
+      <AlignBtn />
+      <ListBtn />
       {sections[2].map((item) => (
         <ToolbarBtn key={item.label} {...item} />
       ))}
