@@ -370,4 +370,14 @@
     outline: 1px solid rgba(0, 0, 0, 0.25);
     border-radius: 0.125rem;
   }
+
+  /* Link styles */
+  a {
+    @apply text-blue-500 hover:text-blue-600;
+    cursor: pointer;
+
+    &:hover {
+      @apply underline;
+    }
+  }
 }

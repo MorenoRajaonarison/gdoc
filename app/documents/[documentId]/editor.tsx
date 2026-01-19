@@ -1,12 +1,13 @@
 "use client";
 
-import { useEditor, EditorContent } from "@tiptap/react";
+import Link from "@tiptap/extension-link";
+import Image from "@tiptap/extension-image";
 import StarterKit from "@tiptap/starter-kit";
+import Highlight from '@tiptap/extension-highlight'
+import { useEditor, EditorContent } from "@tiptap/react";
 import { TaskList, TaskItem } from "@tiptap/extension-list";
 import { TableKit } from "@tiptap/extension-table";
-import Image from "@tiptap/extension-image";
 import { TextStyleKit } from "@tiptap/extension-text-style";
-import Highlight from '@tiptap/extension-highlight'
 import { useEditorStore } from "@/store/use-editor-store";
 
 export const Editor = () => {
@@ -59,7 +60,12 @@ export const Editor = () => {
       TextStyleKit,
       Highlight.configure({
         multicolor: true,
-      })      
+      }),
+      Link.configure({
+        openOnClick: false,
+        autolink: true,
+        defaultProtocol: "https",
+      })
     ],
     content: `
         <table>

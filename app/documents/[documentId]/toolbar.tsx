@@ -15,6 +15,7 @@ import {
   RemoveFormattingIcon,
   ChevronDownIcon,
   HighlighterIcon,
+  Link2Icon,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -160,6 +161,32 @@ const TextColorBtn = () => {
       </DropdownMenuTrigger>
       <DropdownMenuContent className="p-0">
         <SketchPicker onChange={onChange} color={currentColor} />
+      </DropdownMenuContent>
+    </DropdownMenu>
+  )
+}
+
+const LinkBtn = () => {
+  const { editor } = useEditorStore();
+
+  const [hrefvalue, setHrefvalue] = React.useState(editor?.getAttributes("link").href || "");
+
+  const onChange = (href: string) => {
+    editor?.chain().focus().extendMarkRange('link').setLink({href}).run();
+    setHrefvalue('');
+  }
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <button
+          className="h-7 min-w-7 shrink-0 flex flex-col gap-1 items-center justify-center rounded-sm hover:bg-neutral-200/80 px-1.5 overflow-hidden text-sm"
+        >
+          <Link2Icon className="size-4" />
+        </button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="p-2.5 flex items-center gap-x-2">
+        
       </DropdownMenuContent>
     </DropdownMenu>
   )
