@@ -26,6 +26,9 @@ export const Editor = () => {
     onSelectionUpdate({ editor }) {
       setEditor(editor);
     },
+    onTransaction({ editor }) {
+      setEditor(editor);
+    },
     onFocus({ editor }) {
       setEditor(editor);
     },
