@@ -16,7 +16,20 @@ import {
   ChevronDownIcon,
   HighlighterIcon,
   Link2Icon,
+  ImageIcon,
+  UploadIcon,
+  SearchIcon,
 } from "lucide-react";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -26,9 +39,10 @@ import {
 import { cn } from "@/lib/utils";
 import { useEditorStore } from "@/store/use-editor-store";
 import { Separator } from "@/components/ui/separator";
-import { Button } from "@/components/ui/button";
 import { type Level } from "@tiptap/extension-heading";
-import { CirclePicker, SketchPicker, type ColorResult } from "react-color";
+import { SketchPicker, type ColorResult } from "react-color";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 interface ToolbarBtnProps {
   onClick?: () => void;
@@ -60,9 +74,7 @@ const HeadingLevelBtn = () => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button
-          className="h-7 min-w-7 shrink-0 flex items-center justify-center rounded-sm hover:bg-neutral-200/80"
-        >
+        <button className="h-7 min-w-7 shrink-0 flex items-center justify-center rounded-sm hover:bg-neutral-200/80">
           <span className="truncate">{getCurrentHeading()}</span>
           <ChevronDownIcon className="p-1 flex flex-col gap-y-1" />
         </button>
@@ -111,9 +123,7 @@ const FontFamilyBtn = () => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button
-          className="h-7 w-[120px] shrink-0 flex items-center justify-between rounded-sm hover:bg-neutral-200/80 px-1.5 overflow-hidden text-sm"
-        >
+        <button className="h-7 w-[120px] shrink-0 flex items-center justify-between rounded-sm hover:bg-neutral-200/80 px-1.5 overflow-hidden text-sm">
           <div className="truncate">
             {editor?.getAttributes("textStyle").fontFamily || "Arial"}
           </div>
@@ -147,50 +157,137 @@ const TextColorBtn = () => {
 
   const onChange = (color: ColorResult) => {
     editor?.chain().focus().setColor(color.hex).run();
-  }
+  };
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button
-          className="h-7 min-w-7 shrink-0 flex flex-col gap-1 items-center justify-center rounded-sm hover:bg-neutral-200/80 px-1.5 overflow-hidden text-sm"
-        >
+        <button className="h-7 min-w-7 shrink-0 flex flex-col gap-1 items-center justify-center rounded-sm hover:bg-neutral-200/80 px-1.5 overflow-hidden text-sm">
           <span className="text-xs">A</span>
-          <div className="h-0.5 w-full" style={{ backgroundColor: currentColor }}/>
+          <div
+            className="h-0.5 w-full"
+            style={{ backgroundColor: currentColor }}
+          />
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="p-0">
         <SketchPicker onChange={onChange} color={currentColor} />
       </DropdownMenuContent>
     </DropdownMenu>
-  )
-}
+  );
+};
 
 const LinkBtn = () => {
   const { editor } = useEditorStore();
 
-  const [hrefvalue, setHrefvalue] = React.useState(editor?.getAttributes("link").href || "");
+  const [hrefvalue, setHrefvalue] = React.useState(
+    editor?.getAttributes("link").href || ""
+  );
 
   const onChange = (href: string) => {
-    editor?.chain().focus().extendMarkRange('link').setLink({href}).run();
-    setHrefvalue('');
-  }
+    editor?.chain().focus().extendMarkRange("link").setLink({ href }).run();
+    setHrefvalue("");
+  };
 
   return (
-    <DropdownMenu>
+    <DropdownMenu
+      onOpenChange={(open) => {
+        if (open) {
+          setHrefvalue(editor?.getAttributes("link").href || "");
+        }
+      }}
+    >
       <DropdownMenuTrigger asChild>
-        <button
-          className="h-7 min-w-7 shrink-0 flex flex-col gap-1 items-center justify-center rounded-sm hover:bg-neutral-200/80 px-1.5 overflow-hidden text-sm"
-        >
+        <button className="h-7 min-w-7 shrink-0 flex flex-col gap-1 items-center justify-center rounded-sm hover:bg-neutral-200/80 px-1.5 overflow-hidden text-sm">
           <Link2Icon className="size-4" />
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="p-2.5 flex items-center gap-x-2">
-        
+        <Input
+          value={hrefvalue}
+          placeholder="https://example.com"
+          onChange={(e) => setHrefvalue(e.currentTarget.value)}
+        />
+        <Button onClick={() => onChange(hrefvalue)}>Apply</Button>
       </DropdownMenuContent>
     </DropdownMenu>
-  )
-}
+  );
+};
+
+const ImageBtn = () => {
+  const { editor } = useEditorStore();
+
+  const [imgUrl, setImgUrl] = React.useState("");
+  const [dialogOpen, setDialogOpen] = React.useState(false);
+
+  const onChange = (src: string) => {
+    editor?.chain().focus().setImage({ src }).run();
+  };
+
+  const onUpload = (e: React.MouseEvent<HTMLDivElement>) => {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/*";
+    input.onchange = () => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (file) {
+        const imgUrl = URL.createObjectURL(file);
+        onChange(imgUrl);
+      }
+    };
+    input.click();
+  };
+
+  const handleImgUrlSubmit = () => {
+    if (imgUrl) {
+      onChange(imgUrl);
+      setDialogOpen(false);
+      setImgUrl("");
+    }
+  };
+
+  return (
+    <>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <button className="h-7 min-w-7 shrink-0 flex flex-col gap-1 items-center justify-center rounded-sm hover:bg-neutral-200/80 px-1.5 overflow-hidden text-sm">
+            <ImageIcon className="size-4" />
+          </button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent>
+          <DropdownMenuItem onClick={onUpload}>
+            <UploadIcon className="size-4 mr-2" />
+            Upload
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => setDialogOpen(true)}>
+            <SearchIcon className="size-4 mr-2" />
+            Paste image url
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Insert image url</DialogTitle>
+          </DialogHeader>
+          <Input
+            placeholder="Insert image url"
+            value={imgUrl}
+            onChange={(e) => setImgUrl(e.currentTarget.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                handleImgUrlSubmit();
+              }
+            }}
+          />
+          <DialogFooter>
+            <Button onClick={handleImgUrlSubmit}>Insert</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
+  );
+};
 
 const HighlightColorBtn = () => {
   const { editor } = useEditorStore();
@@ -198,24 +295,22 @@ const HighlightColorBtn = () => {
   const currentColor = editor?.getAttributes("highlight").color || "#ffffff";
 
   const onChange = (color: ColorResult) => {
-    editor?.chain().focus().setHighlight({color: color.hex}).run();
-  }
+    editor?.chain().focus().setHighlight({ color: color.hex }).run();
+  };
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button
-          className="h-7 min-w-7 shrink-0 flex flex-col gap-1 items-center justify-center rounded-sm hover:bg-neutral-200/80 px-1.5 overflow-hidden text-sm"
-        >
+        <button className="h-7 min-w-7 shrink-0 flex flex-col gap-1 items-center justify-center rounded-sm hover:bg-neutral-200/80 px-1.5 overflow-hidden text-sm">
           <HighlighterIcon className="size-4" />
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="p-0">
-        <SketchPicker onChange={onChange} color={currentColor}/>
+        <SketchPicker onChange={onChange} color={currentColor} />
       </DropdownMenuContent>
     </DropdownMenu>
-  )
-}
+  );
+};
 
 const ToolbarBtn = ({ onClick, isActive, icon: Icon }: ToolbarBtnProps) => {
   return (
@@ -326,6 +421,8 @@ const Toolbar = () => {
       <TextColorBtn />
       <HighlightColorBtn />
       <Separator orientation="vertical" className="h-6! bg-neutral-300" />
+      <LinkBtn />
+      <ImageBtn />
       {sections[2].map((item) => (
         <ToolbarBtn key={item.label} {...item} />
       ))}
