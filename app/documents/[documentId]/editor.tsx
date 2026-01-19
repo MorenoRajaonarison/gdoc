@@ -6,6 +6,7 @@ import { TaskList, TaskItem } from "@tiptap/extension-list";
 import { TableKit } from "@tiptap/extension-table";
 import Image from "@tiptap/extension-image";
 import { TextStyleKit } from "@tiptap/extension-text-style";
+import Highlight from '@tiptap/extension-highlight'
 import { useEditorStore } from "@/store/use-editor-store";
 
 export const Editor = () => {
@@ -56,6 +57,9 @@ export const Editor = () => {
         },
       }),
       TextStyleKit,
+      Highlight.configure({
+        multicolor: true,
+      })      
     ],
     content: `
         <table>

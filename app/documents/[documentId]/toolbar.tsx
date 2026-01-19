@@ -14,6 +14,7 @@ import {
   ListTodoIcon,
   RemoveFormattingIcon,
   ChevronDownIcon,
+  HighlighterIcon,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -26,6 +27,7 @@ import { useEditorStore } from "@/store/use-editor-store";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { type Level } from "@tiptap/extension-heading";
+import { CirclePicker, SketchPicker, type ColorResult } from "react-color";
 
 interface ToolbarBtnProps {
   onClick?: () => void;
@@ -57,13 +59,12 @@ const HeadingLevelBtn = () => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button
-          variant="outline"
+        <button
           className="h-7 min-w-7 shrink-0 flex items-center justify-center rounded-sm hover:bg-neutral-200/80"
         >
           <span className="truncate">{getCurrentHeading()}</span>
           <ChevronDownIcon className="p-1 flex flex-col gap-y-1" />
-        </Button>
+        </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="p-1 flex flex-col gap-x-1">
         {headings.map(({ label, value, fontSize }) => (
@@ -109,15 +110,14 @@ const FontFamilyBtn = () => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button
-          variant="outline"
+        <button
           className="h-7 w-[120px] shrink-0 flex items-center justify-between rounded-sm hover:bg-neutral-200/80 px-1.5 overflow-hidden text-sm"
         >
           <div className="truncate">
             {editor?.getAttributes("textStyle").fontFamily || "Arial"}
           </div>
           <ChevronDownIcon className="p-1 flex flex-col gap-y-1" />
-        </Button>
+        </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="p-1 flex flex-col gap-x-1">
         {fonts.map(({ label, value }) => (
@@ -138,6 +138,57 @@ const FontFamilyBtn = () => {
     </DropdownMenu>
   );
 };
+
+const TextColorBtn = () => {
+  const { editor } = useEditorStore();
+
+  const currentColor = editor?.getAttributes("textStyle").color || "#000000";
+
+  const onChange = (color: ColorResult) => {
+    editor?.chain().focus().setColor(color.hex).run();
+  }
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <button
+          className="h-7 min-w-7 shrink-0 flex flex-col gap-1 items-center justify-center rounded-sm hover:bg-neutral-200/80 px-1.5 overflow-hidden text-sm"
+        >
+          <span className="text-xs">A</span>
+          <div className="h-0.5 w-full" style={{ backgroundColor: currentColor }}/>
+        </button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="p-0">
+        <SketchPicker onChange={onChange} color={currentColor} />
+      </DropdownMenuContent>
+    </DropdownMenu>
+  )
+}
+
+const HighlightColorBtn = () => {
+  const { editor } = useEditorStore();
+
+  const currentColor = editor?.getAttributes("highlight").color || "#ffffff";
+
+  const onChange = (color: ColorResult) => {
+    editor?.chain().focus().setHighlight({color: color.hex}).run();
+  }
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <button
+          className="h-7 min-w-7 shrink-0 flex flex-col gap-1 items-center justify-center rounded-sm hover:bg-neutral-200/80 px-1.5 overflow-hidden text-sm"
+        >
+          <HighlighterIcon className="size-4" />
+        </button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="p-0">
+        <SketchPicker onChange={onChange} color={currentColor}/>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  )
+}
 
 const ToolbarBtn = ({ onClick, isActive, icon: Icon }: ToolbarBtnProps) => {
   return (
@@ -245,7 +296,8 @@ const Toolbar = () => {
       {sections[1].map((item) => (
         <ToolbarBtn key={item.label} {...item} />
       ))}
-      {/* TODO: Text color, highligh color */}
+      <TextColorBtn />
+      <HighlightColorBtn />
       <Separator orientation="vertical" className="h-6! bg-neutral-300" />
       {sections[2].map((item) => (
         <ToolbarBtn key={item.label} {...item} />
