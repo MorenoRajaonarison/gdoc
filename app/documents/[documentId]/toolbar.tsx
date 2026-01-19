@@ -25,6 +25,8 @@ import {
   AlignJustifyIcon,
   ListIcon,
   ListOrderedIcon,
+  MinusIcon,
+  PlusIcon,
 } from "lucide-react";
 import {
   Dialog,
@@ -415,6 +417,89 @@ const ListBtn = () => {
   );
 };
 
+const FontSizeBtn = () => {
+  const { editor } = useEditorStore();
+  const currentFontSize = editor?.getAttributes("textStyle").fontSize
+    ? editor?.getAttributes("textStyle").fontSize.replace("px", "")
+    : "16";
+
+  const [inputValue, setInputValue] = React.useState(currentFontSize);
+  const [isEditing, setIsEditing] = React.useState(false);
+
+  const updateFontSize = (newSize: string) => {
+    const size = parseInt(newSize, 10);
+    if (!isNaN(size) && size > 0) {
+      editor?.chain().focus().setFontSize(`${size}px`).run();
+      setInputValue(newSize);
+      setIsEditing(false);
+    }
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInputValue(e.target.value);
+  };
+
+  const handleInputBlur = () => {
+    updateFontSize(inputValue);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      updateFontSize(inputValue);
+    }
+  };
+
+  const increment = () => {
+    const newSize = parseInt(currentFontSize, 10) + 1;
+    updateFontSize(newSize.toString());
+  };
+
+  const decrement = () => {
+    const newSize = parseInt(currentFontSize, 10) - 1;
+    if (newSize > 0) {
+      updateFontSize(newSize.toString());
+    }
+  };
+
+  return (
+    <div className="flex items-center gap-x-0.5">
+      <button
+        onClick={decrement}
+        className="h-7 w-7 shrink-0 flex items-center justify-center rounded-sm hover:bg-neutral-200/80"
+      >
+        <MinusIcon className="size-4" />
+      </button>
+      {isEditing ? (
+        <input
+          type="text"
+          value={inputValue}
+          onChange={handleInputChange}
+          onBlur={handleInputBlur}
+          onKeyDown={handleKeyDown}
+          className="h-7 w-10 text-sm text-center border border-neutral-400 rounded-sm bg-transparent focus:outline-none focus:ring-0"
+        />
+      ) : (
+        <button
+          onClick={() => {
+            setIsEditing(true);
+            setInputValue(currentFontSize);
+          }}
+          className="h-7 w-10 text-sm text-center border border-neutral-400 rounded-sm bg-transparent cursor-text hover:bg-neutral-200/80"
+        >
+          {currentFontSize}
+        </button>
+      )}
+      <button
+        onClick={increment}
+        className="h-7 w-7 shrink-0 flex items-center justify-center rounded-sm hover:bg-neutral-200/80"
+      >
+        <PlusIcon className="size-4" />
+      </button>
+    </div>
+  );
+};
+
 const ToolbarBtn = ({ onClick, isActive, icon: Icon }: ToolbarBtnProps) => {
   return (
     <button
@@ -517,6 +602,7 @@ const Toolbar = () => {
       <Separator orientation="vertical" className="h-6! bg-neutral-300" />
       <FontFamilyBtn />
       <HeadingLevelBtn />
+      <FontSizeBtn />
       {/* TODO: Font family, heading, font size */}
       {sections[1].map((item) => (
         <ToolbarBtn key={item.label} {...item} />
