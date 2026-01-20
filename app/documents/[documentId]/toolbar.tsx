@@ -680,11 +680,12 @@ const Toolbar = () => {
         <ToolbarBtn key={item.label} {...item} />
       ))}
       <Separator orientation="vertical" className="h-6! bg-neutral-300" />
-      <Separator orientation="vertical" className="h-6! bg-neutral-300" />
-      <Separator orientation="vertical" className="h-6! bg-neutral-300" />
       <FontFamilyBtn />
+      <Separator orientation="vertical" className="h-6! bg-neutral-300" />
       <HeadingLevelBtn />
+      <Separator orientation="vertical" className="h-6! bg-neutral-300" />
       <FontSizeBtn />
+      <Separator orientation="vertical" className="h-6! bg-neutral-300" />
       {/* TODO: Font family, heading, font size */}
       {sections[1].map((item) => (
         <ToolbarBtn key={item.label} {...item} />
