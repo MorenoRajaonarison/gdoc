@@ -27,6 +27,7 @@ import {
   ListOrderedIcon,
   MinusIcon,
   PlusIcon,
+  ListCollapseIcon,
 } from "lucide-react";
 import {
   Dialog,
@@ -51,7 +52,6 @@ import { type Level } from "@tiptap/extension-heading";
 import { SketchPicker, type ColorResult } from "react-color";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import TextAlign from "@tiptap/extension-text-align";
 
 interface ToolbarBtnProps {
   onClick?: () => void;
@@ -425,6 +425,20 @@ const FontSizeBtn = () => {
 
   const [inputValue, setInputValue] = React.useState(currentFontSize);
   const [isEditing, setIsEditing] = React.useState(false);
+  const inputRef = React.useRef<HTMLInputElement>(null);
+
+  React.useEffect(() => {
+    if (!isEditing) {
+      setInputValue(currentFontSize);
+    }
+  }, [currentFontSize, isEditing]);
+
+  React.useEffect(() => {
+    if (isEditing) {
+      inputRef.current?.focus();
+      inputRef.current?.select();
+    }
+  }, [isEditing]);
 
   const updateFontSize = (newSize: string) => {
     const size = parseInt(newSize, 10);
@@ -451,12 +465,14 @@ const FontSizeBtn = () => {
   };
 
   const increment = () => {
-    const newSize = parseInt(currentFontSize, 10) + 1;
+    const baseSize = parseInt(isEditing ? inputValue : currentFontSize, 10);
+    const newSize = (isNaN(baseSize) ? parseInt(currentFontSize, 10) : baseSize) + 1;
     updateFontSize(newSize.toString());
   };
 
   const decrement = () => {
-    const newSize = parseInt(currentFontSize, 10) - 1;
+    const baseSize = parseInt(isEditing ? inputValue : currentFontSize, 10);
+    const newSize = (isNaN(baseSize) ? parseInt(currentFontSize, 10) : baseSize) - 1;
     if (newSize > 0) {
       updateFontSize(newSize.toString());
     }
@@ -472,6 +488,7 @@ const FontSizeBtn = () => {
       </button>
       {isEditing ? (
         <input
+          ref={inputRef}
           type="text"
           value={inputValue}
           onChange={handleInputChange}
@@ -511,6 +528,71 @@ const ToolbarBtn = ({ onClick, isActive, icon: Icon }: ToolbarBtnProps) => {
     >
       <Icon className="size-4" />
     </button>
+  );
+};
+
+const LineHeightBtn = () => {
+  const { editor } = useEditorStore();
+
+  const currentLineHeight = (
+    editor?.isActive("heading")
+      ? editor?.getAttributes("heading").lineHeight
+      : editor?.getAttributes("paragraph").lineHeight
+  ) ?? "normal";
+
+  const lineHeights = [
+    {
+      label: "Default",
+      value: "normal",
+    },
+    {
+      label: "Single",
+      value: "1",
+    },
+        {
+      label: "1.15",
+      value: "1.15",
+    },
+     {
+      label: "1.5",
+      value: "1.5",
+    },
+     {
+      label: "Double",
+      value: "2",
+    }
+  ];
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <button className="h-7 min-w-7 shrink-0 flex flex-col gap-1 items-center justify-center rounded-sm hover:bg-neutral-200/80 px-1.5 overflow-hidden text-sm">
+          <ListCollapseIcon className="size-4" />
+        </button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="p-0 flex flex-col gap-y-1">
+        {lineHeights.map(({ label, value }) => (
+          <button
+            key={value}
+            onClick={() => {
+              const attrs = value === "normal" ? { lineHeight: null } : { lineHeight: value };
+              editor
+                ?.chain()
+                .focus()
+                .updateAttributes("paragraph", attrs)
+                .updateAttributes("heading", attrs)
+                .run();
+            }}
+            className={cn(
+              "flex items-center gap-x-2 px-2 py-1 rounded-sm hover:bg-neutral-200/80",
+              currentLineHeight === value && "bg-neutral-200/80"
+            )}
+          >
+            <span className="text-sm">{label}</span>
+          </button>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 };
 
@@ -613,6 +695,7 @@ const Toolbar = () => {
       <LinkBtn />
       <ImageBtn />
       <AlignBtn />
+      <LineHeightBtn />
       <ListBtn />
       {sections[2].map((item) => (
         <ToolbarBtn key={item.label} {...item} />

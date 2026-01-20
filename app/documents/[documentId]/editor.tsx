@@ -8,7 +8,7 @@ import TextAlign from "@tiptap/extension-text-align";
 import { useEditor, EditorContent } from "@tiptap/react";
 import { TaskList, TaskItem } from "@tiptap/extension-list";
 import { TableKit } from "@tiptap/extension-table";
-import { FontSize, TextStyleKit } from "@tiptap/extension-text-style";
+import { FontSize, TextStyleKit, LineHeight  } from "@tiptap/extension-text-style";
 import { useEditorStore } from "@/store/use-editor-store";
 
 export const Editor = () => {
@@ -17,7 +17,7 @@ export const Editor = () => {
     onCreate({ editor }) {
       setEditor(editor);
     },
-    onDelete() {
+    onDestroy() {
       setEditor(null);
     },
     onUpdate({ editor }) {
@@ -71,6 +71,9 @@ export const Editor = () => {
         types: ["heading", "paragraph"],
       }),
       FontSize,
+      LineHeight.configure({
+        types: ['heading','paragraph'],
+      })
     ],
     content: `
         <table>
