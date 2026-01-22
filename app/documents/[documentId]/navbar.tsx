@@ -37,6 +37,7 @@ import {
   Undo2Icon,
 } from "lucide-react";
 import { useEditorStore } from "@/store/use-editor-store";
+import InsertTableDialog from "@/components/insert-table-dialog";
 
 const Navbar = () => {
   const { editor } = useEditorStore();
@@ -168,6 +169,8 @@ const Navbar = () => {
                       <MenubarItem onClick={() => insertTable({ rows: 3, cols: 3 })}>3 x 3</MenubarItem>
                       <MenubarItem onClick={() => insertTable({ rows: 4, cols: 4 })}>4 x 4</MenubarItem>
                       <MenubarItem onClick={() => insertTable({ rows: 5, cols: 5 })}>5 x 5</MenubarItem>
+                      <MenubarSeparator />
+                      <InsertTableDialog />
                     </MenubarSubContent>
                   </MenubarSub>
                 </MenubarContent>
