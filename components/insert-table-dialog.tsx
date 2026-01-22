@@ -12,10 +12,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { useEditorStore } from "@/store/use-editor-store";
-<<<<<<< HEAD
 import { cn } from "@/lib/utils";
-=======
->>>>>>> dc9e81c462bf2a3c68d1f0582257c9d6ce415aa4
 
 /**
  * Composant dialogue pour insérer un tableau dans l'éditeur
