@@ -26,7 +26,7 @@ import {
   FileType,
   ItalicIcon,
   PrinterIcon,
-  RedoIcon,
+  Redo2Icon,
   RemoveFormatting,
   SaveIcon,
   StrikethroughIcon,
@@ -34,10 +34,47 @@ import {
   TextIcon,
   TrashIcon,
   UnderlineIcon,
-  UndoIcon,
+  Undo2Icon,
 } from "lucide-react";
+import { useEditorStore } from "@/store/use-editor-store";
 
 const Navbar = () => {
+  const { editor } = useEditorStore();
+
+  const insertTable = ({rows, cols}: {rows: number, cols: number}) => {
+    editor?.commands.insertTable({ rows, cols, withHeaderRow: false })
+  }
+
+  const onDownload = (blob: Blob, fileName: string) => {
+    const url = URL.createObjectURL(blob)
+    const anchor = document.createElement("a")
+    anchor.href = url
+    anchor.download = fileName
+    anchor.click()
+    URL.revokeObjectURL(url)
+  }
+
+  const onSaveJson = () => {
+    if(!editor) return;
+    const content = editor?.getJSON()
+    const blob = new Blob([JSON.stringify(content)], { type: "application/json" })
+    onDownload(blob, "document.json")
+  }
+
+  const onSaveHtml = () => {
+    if(!editor) return;
+    const content = editor?.getHTML()
+    const blob = new Blob([content], { type: "text/html" })
+    onDownload(blob, "document.html")
+  }
+
+  const onSaveText = () => {
+    if(!editor) return;
+    const content = editor?.getHTML()
+    const blob = new Blob([content], { type: "text/plain" })
+    onDownload(blob, "document.txt")
+  }
+
   return (
     <nav className="flex items-center justify-between">
       <div className="flex gap-2 items-center">
@@ -59,19 +96,19 @@ const Navbar = () => {
                       Save
                     </MenubarSubTrigger>
                     <MenubarSubContent>
-                      <MenubarItem>
+                      <MenubarItem onClick={onSaveJson}>
                         <FileBraces />
                         JSON
                       </MenubarItem>
-                      <MenubarItem>
+                      <MenubarItem onClick={onSaveHtml}>
                         <Code />
                         HTML
                       </MenubarItem>
-                      <MenubarItem>
+                      <MenubarItem onClick={() => window.print()}> 
                         <FileText />
                         PDF
                       </MenubarItem>
-                      <MenubarItem>
+                      <MenubarItem onClick={onSaveText}>
                         <FileType />
                         Text
                       </MenubarItem>
@@ -103,13 +140,13 @@ const Navbar = () => {
                   Edit
                 </MenubarTrigger>
                 <MenubarContent>
-                  <MenubarItem>
-                    <UndoIcon />
+                  <MenubarItem onClick={() => editor?.commands.undo()}>
+                    <Undo2Icon />
                     Undo
                     <MenubarShortcut>cmd+z</MenubarShortcut>
                   </MenubarItem>
-                  <MenubarItem>
-                    <RedoIcon />
+                  <MenubarItem onClick={() => editor?.commands.redo()}>
+                    <Redo2Icon />
                     Redo
                     <MenubarShortcut>cmd+y</MenubarShortcut>
                   </MenubarItem>
@@ -126,8 +163,11 @@ const Navbar = () => {
                       Table
                     </MenubarSubTrigger>
                     <MenubarSubContent>
-                      <MenubarItem>1 x 1</MenubarItem>
-                      <MenubarItem>2 x 2</MenubarItem>
+                      <MenubarItem onClick={() => insertTable({ rows: 1, cols: 1 })}>1 x 1</MenubarItem>
+                      <MenubarItem onClick={() => insertTable({ rows: 2, cols: 2 })}>2 x 2</MenubarItem>
+                      <MenubarItem onClick={() => insertTable({ rows: 3, cols: 3 })}>3 x 3</MenubarItem>
+                      <MenubarItem onClick={() => insertTable({ rows: 4, cols: 4 })}>4 x 4</MenubarItem>
+                      <MenubarItem onClick={() => insertTable({ rows: 5, cols: 5 })}>5 x 5</MenubarItem>
                     </MenubarSubContent>
                   </MenubarSub>
                 </MenubarContent>
@@ -143,25 +183,25 @@ const Navbar = () => {
                       Text
                     </MenubarSubTrigger>
                     <MenubarSubContent>
-                      <MenubarItem>
+                      <MenubarItem onClick={() => editor?.commands.toggleBold()}>
                         <BoldIcon />
                         Bold<MenubarShortcut>cmd+b</MenubarShortcut>
-                      </MenubarItem>
-                      <MenubarItem>
+                      </MenubarItem> 
+                      <MenubarItem onClick={() => editor?.commands.toggleItalic()}>
                         <ItalicIcon />
                         Italic<MenubarShortcut>cmd+i</MenubarShortcut>
                       </MenubarItem>
-                      <MenubarItem>
+                      <MenubarItem onClick={() => editor?.commands.toggleUnderline()}>
                         <UnderlineIcon />
                         Underline<MenubarShortcut>cmd+u</MenubarShortcut>
                       </MenubarItem>
-                      <MenubarItem>
+                      <MenubarItem onClick={() => editor?.commands.toggleStrike()}>
                         <StrikethroughIcon />
                         Strikethrough<MenubarShortcut>cmd+s</MenubarShortcut>
                       </MenubarItem>
                     </MenubarSubContent>
                   </MenubarSub>
-                  <MenubarItem>
+                  <MenubarItem onClick={() => editor?.commands.unsetAllMarks()}>
                     <RemoveFormatting />
                     Clear formatting
                   </MenubarItem>
