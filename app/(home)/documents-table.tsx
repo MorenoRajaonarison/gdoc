@@ -57,7 +57,7 @@ const DocumentsTable = ({docs, status, loadMore}: Props) => {
         }
         <div className="flex items-center justify-center">
             <Button size="sm" variant="ghost" onClick={() => loadMore(5)} disabled={status !== "CanLoadMore"}>
-                {status === "CanLoadMore" ? "Load more" : "No more documents"}
+                {status === "CanLoadMore" ? "Load more" : "End results"}
             </Button>
         </div>
     </div>
