@@ -4,18 +4,17 @@ import { Doc } from "@/convex/_generated/dataModel";
 import { Building2Icon, CircleUserIcon, MoreVerticalIcon } from "lucide-react";
 import { format } from "date-fns";
 import DocumentMenu from "./document-menu";
+import { useRouter } from "next/navigation";
 
 interface Props {
   doc: Doc<"documents">;
 }
 
 const DocumentRow = ({ doc }: Props) => {
-  const onNewTabClick = (id: string) => {
-    window.open(`/documents/${id}`, "_blank");
-  };
+  const router = useRouter();
 
   return (
-    <TableRow className="cursor-pointer">
+    <TableRow className="cursor-pointer" onClick={() => router.push(`documents/${doc._id}`)}>
       <TableCell className="w-[50px]">
         <SiGoogledocs className="size-6 fill-blue-500" />
       </TableCell>
@@ -35,7 +34,9 @@ const DocumentRow = ({ doc }: Props) => {
         <DocumentMenu
           documentId={doc._id}
           title={doc.title}
-          onNewTab={onNewTabClick}
+          onNewTab={(id: string) => {
+            window.open(`/documents/${doc._id}`, "_blank");
+          }}
         />
       </TableCell>
     </TableRow>

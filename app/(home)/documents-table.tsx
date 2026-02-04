@@ -11,6 +11,7 @@ import {
 import React from 'react'
 import { Spinner } from "@/components/ui/spinner"
 import DocumentRow from './document-row';
+import { Button } from '@/components/ui/button';
 
 interface Props {
     docs: Doc<"documents">[]|undefined;
@@ -54,6 +55,11 @@ const DocumentsTable = ({docs, status, loadMore}: Props) => {
                 </Table>
             )
         }
+        <div className="flex items-center justify-center">
+            <Button size="sm" variant="ghost" onClick={() => loadMore(5)} disabled={status !== "CanLoadMore"}>
+                {status === "CanLoadMore" ? "Load more" : "No more documents"}
+            </Button>
+        </div>
     </div>
   )
 }
