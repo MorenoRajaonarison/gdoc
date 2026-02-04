@@ -120,11 +120,11 @@ const Navbar = () => {
                     New Document
                   </MenubarItem>
                   <MenubarSeparator />
-                  <MenubarItem>
+                  <MenubarItem onSelect={(e) => e.preventDefault()}>
                     <FilePenIcon />
                     Rename
                   </MenubarItem>
-                  <MenubarItem>
+                  <MenubarItem onSelect={(e) => e.preventDefault()}>
                     <TrashIcon />
                     Remove
                   </MenubarItem>
