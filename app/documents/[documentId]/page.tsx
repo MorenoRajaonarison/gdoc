@@ -9,6 +9,7 @@ interface DocumentIdPageProps {
 }
 
 const page = async ({ params }: DocumentIdPageProps) => {
+  throw Error("Not implemented");
   const { documentId } = await params;
   return (
     <div className="min-h-screen bg-[#fafbfd]">
