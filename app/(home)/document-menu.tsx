@@ -8,7 +8,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Doc, Id } from "@/convex/_generated/dataModel";
-import { EditIcon, ExternalLinkIcon, MoreVerticalIcon, TrashIcon } from "lucide-react";
+import {
+  EditIcon,
+  ExternalLinkIcon,
+  MoreVerticalIcon,
+  TrashIcon,
+} from "lucide-react";
 
 interface Props {
   documentId: Id<"documents">;
@@ -26,18 +31,29 @@ const DocumentMenu = ({ documentId, title, onNewTab }: Props) => {
       </DropdownMenuTrigger>
       <DropdownMenuContent>
         <RenameDialog documentId={documentId} initialTitle={title}>
-          <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+          <DropdownMenuItem
+            onSelect={(e) => e.preventDefault()}
+            onClick={(e) => e.stopPropagation()}
+          >
             <EditIcon className="size-4 mr-2" />
             Rename
           </DropdownMenuItem>
         </RenameDialog>
         <RemoveDialog documentId={documentId}>
-          <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+          <DropdownMenuItem
+            onSelect={(e) => e.preventDefault()}
+            onClick={(e) => e.stopPropagation()}
+          >
             <TrashIcon className="size-4 mr-2" />
             Remove
           </DropdownMenuItem>
         </RemoveDialog>
-        <DropdownMenuItem onClick={() => onNewTab(documentId)}>
+        <DropdownMenuItem
+          onClick={(e) => {
+            e.stopPropagation();
+            onNewTab(documentId);
+          }}
+        >
           <ExternalLinkIcon className="size-4 mr-2" />
           Open in a new tab
         </DropdownMenuItem>
