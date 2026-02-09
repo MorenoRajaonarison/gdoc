@@ -38,6 +38,8 @@ import {
 } from "lucide-react";
 import { useEditorStore } from "@/store/use-editor-store";
 import InsertTableDialog from "@/components/insert-table-dialog";
+import { Avatars } from "./avatars";
+import { OrganizationSwitcher, UserButton } from "@clerk/nextjs";
 
 const Navbar = () => {
   const { editor } = useEditorStore();
@@ -213,6 +215,16 @@ const Navbar = () => {
             </Menubar>
           </div>
         </div>
+      </div>
+      <div className="flex gap-3 items-center pl-6">
+        <Avatars />
+        <OrganizationSwitcher
+          afterCreateOrganizationUrl='/'
+          afterLeaveOrganizationUrl="/"
+          afterSelectOrganizationUrl="/"
+          afterSelectPersonalUrl='/'
+        />
+        <UserButton />
       </div>
     </nav>
   );
