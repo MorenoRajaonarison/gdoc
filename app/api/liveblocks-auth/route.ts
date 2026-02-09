@@ -8,6 +8,12 @@ const liveblocks = new Liveblocks({
     secret: process.env.LIVEBLOCKS_SECRET_KEY!,
 })
 
+interface SessionClaims {
+  o?: {
+    id: string;
+  };
+}
+
 export async function POST(req: Request) {
     const {sessionClaims} = await auth()
     if(!sessionClaims) {
