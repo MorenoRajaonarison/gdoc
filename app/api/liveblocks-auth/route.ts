@@ -8,6 +8,12 @@ const liveblocks = new Liveblocks({
     secret: process.env.LIVEBLOCKS_SECRET_KEY!,
 })
 
+interface SessionClaims {
+  o?: {
+    id: string;
+  };
+}
+
 export async function POST(req: Request) {
     const {sessionClaims} = await auth()
     if(!sessionClaims) {
@@ -27,7 +33,7 @@ export async function POST(req: Request) {
     }
 
     const isOwner = doc.ownerId === user.id
-    const isOrganizationMember = !!(doc.organizationId && doc.organizationId === sessionClaims.org_id)
+    const isOrganizationMember = !!(doc.organizationId && doc.organizationId === (sessionClaims?.o as any)?.id)
 
     if(!isOwner && !isOrganizationMember) {
         return new Response("Unauthorized", {status: 401})
