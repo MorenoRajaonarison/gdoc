@@ -123,3 +123,28 @@ export const getById = query({
         return await ctx.db.get(id)
     }
 })
+
+export const getByIds = query({
+    args: {ids: v.array(v.id('documents'))},
+    handler: async (ctx, {ids}) => {
+        const docs = []
+
+        for (const id of ids) {
+            const doc = await ctx.db.get(id)
+
+            if(doc) {
+                docs.push({
+                    id: doc._id,
+                    name: doc.title
+                })
+            } else {
+                docs.push({
+                    id,
+                    name: "Deleted"
+                })
+            }
+        }
+
+        return docs
+    }
+})
