@@ -1,3 +1,4 @@
+import { useMutation, useStorage } from "@liveblocks/react";
 import { useRef, useState } from "react";
 import { FaCaretDown } from "react-icons/fa";
 
@@ -26,11 +27,10 @@ const Marker = ({
   >
     <FaCaretDown className="absolute left-0.5 top-0 h-full fill-blue-500 transform -translate-x-0.5" />
     <div
-      className="absolute left-0.5 top-4 transform -translate-x-0.5"
+      className="absolute left-2 top-4"
       style={{
         height: "100vh",
         width: "1px",
-        transform: "scaleX(0.5)",
         backgroundColor: "#3b72f6",
         display: isDragging ? "block" : "none",
       }}
@@ -39,10 +39,17 @@ const Marker = ({
 );
 
 const Ruler = () => {
-  const [leftMargin, setLeftMargin] = useState(56);
-  const [rightMargin, setRightMargin] = useState(56);
-  const [isDraggingLeft, setIsDraggingLeft] = useState(false);
-  const [isDraggingRight, setIsDraggingRight] = useState(false);
+  const leftMargin = useStorage(root => root.leftMargin) ?? 56
+  const setLeftMargin = useMutation(({storage}, position: number) => {
+    storage.set('leftMargin', position)
+  }, [])
+  const rightMargin = useStorage(root => root.rightMargin) ?? 56
+    const setRightMargin = useMutation(({storage}, position: number) => {
+    storage.set('rightMargin', position)
+  }, [])
+
+  const [isDraggingLeft, setIsDraggingLeft] = useState(false)
+  const [isDraggingRight, setIsDraggingRight] = useState(false)
   const rulerRef = useRef<HTMLDivElement>(null);
 
   const handleLeftMouseDown = () => {
