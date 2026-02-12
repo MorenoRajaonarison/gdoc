@@ -81,18 +81,12 @@ export const Editor = ({initialContent}: Props) => {
       Highlight.configure({
         multicolor: true,
       }),
-      Link.configure({
-        openOnClick: false,
-        autolink: true,
-        defaultProtocol: "https",
-      }),
+      
       TextAlign.configure({
         types: ["heading", "paragraph"],
       }),
       FontSize,
-      LineHeight.configure({
-        types: ['heading','paragraph'],
-      })
+
     ],
     content: `
         
