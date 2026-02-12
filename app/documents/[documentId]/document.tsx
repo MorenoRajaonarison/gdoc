@@ -6,6 +6,7 @@ import Navbar from "./navbar";
 import { Room } from "./room";
 import { Preloaded, usePreloadedQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
+import { useRouter } from "next/navigation";
 
 interface DocumentIdPageProps {
     preloadedDocument: Preloaded<typeof api.documents.getById>
@@ -13,6 +14,12 @@ interface DocumentIdPageProps {
 
 export const Document = ({ preloadedDocument }: DocumentIdPageProps) => {
     const document = usePreloadedQuery(preloadedDocument)
+    const router = useRouter()
+
+    if (!document) {
+        router.push('/')
+        return null
+    }
 
   return (
     <Room>
@@ -22,7 +29,7 @@ export const Document = ({ preloadedDocument }: DocumentIdPageProps) => {
           <Toolbar />
         </div>
         <div className="pt-[114px] print:pt-0">
-          <Editor />
+          <Editor initialContent={document.initialContent} />
         </div>
       </div>
     </Room>
