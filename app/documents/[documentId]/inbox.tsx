@@ -2,7 +2,6 @@
 
 import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { Separator } from "@/components/ui/separator"
 import { InboxNotification, InboxNotificationList } from "@liveblocks/react-ui"
 import { ClientSideSuspense, useInboxNotifications } from "@liveblocks/react/suspense"
 import { BellIcon } from "lucide-react"
@@ -11,8 +10,8 @@ export const Inbox = () => {
     return (
         <ClientSideSuspense fallback={
             <Button variant="ghost" className="relative" size="icon" disabled>
-                    <BellIcon className="size-5"/>
-                </Button>
+                <BellIcon className="size-5"/>
+            </Button>
         }>
             <InboxMenu />
         </ClientSideSuspense>

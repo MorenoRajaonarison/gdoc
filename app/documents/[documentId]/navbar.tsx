@@ -41,10 +41,36 @@ import InsertTableDialog from "@/components/insert-table-dialog";
 import { Avatars } from "./avatars";
 import { OrganizationSwitcher, UserButton } from "@clerk/nextjs";
 import { Inbox } from "./inbox";
+import { Doc } from "@/convex/_generated/dataModel";
+import { useMutation } from "convex/react";
+import { api } from "@/convex/_generated/api";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import RemoveDialog from "@/components/remove-dialog";
+import RenameDialog from "@/components/rename-dialog";
 
-const Navbar = () => {
+interface NavbarProps {
+    data: Doc<"documents">
+}
+
+const Navbar = ({data}: NavbarProps) => {
+  const router = useRouter()
   const { editor } = useEditorStore();
 
+  const mutation = useMutation(api.documents.createDocument)
+
+  const onNewDoc = () => {
+    mutation({
+      title: "Untitled Document",
+      initialContent: ""
+    }).then(id => {
+      toast.success('Document created')
+      router.push(`/documents/${id}`)
+    }).catch(() => {
+      toast.error('Failed to create document')
+    })
+  }
+  
   const insertTable = ({rows, cols}: {rows: number, cols: number}) => {
     editor?.commands.insertTable({ rows, cols, withHeaderRow: false })
   }
@@ -62,21 +88,21 @@ const Navbar = () => {
     if(!editor) return;
     const content = editor?.getJSON()
     const blob = new Blob([JSON.stringify(content)], { type: "application/json" })
-    onDownload(blob, "document.json")
+    onDownload(blob, `${data.title}.json`)
   }
 
   const onSaveHtml = () => {
     if(!editor) return;
     const content = editor?.getHTML()
     const blob = new Blob([content], { type: "text/html" })
-    onDownload(blob, "document.html")
+    onDownload(blob, `${data.title}.html`)
   }
 
   const onSaveText = () => {
     if(!editor) return;
     const content = editor?.getHTML()
     const blob = new Blob([content], { type: "text/plain" })
-    onDownload(blob, "document.txt")
+    onDownload(blob, `${data.title}.txt`)
   }
 
   return (
@@ -86,7 +112,7 @@ const Navbar = () => {
           <Image width={36} height={36} src="/logo.svg" alt="Logo" />
         </Link>
         <div className="flex flex-col">
-          <DocumentInput />
+          <DocumentInput title={data.title} id={data._id} />
           <div className="flex">
             <Menubar className="border-none bg-transparent shadow-none h-auto p-0">
               <MenubarMenu>
@@ -118,19 +144,23 @@ const Navbar = () => {
                       </MenubarItem>
                     </MenubarSubContent>
                   </MenubarSub>
-                  <MenubarItem>
+                  <MenubarItem onClick={onNewDoc}>
                     <FilePlusIcon />
                     New Document
                   </MenubarItem>
                   <MenubarSeparator />
-                  <MenubarItem onSelect={(e) => e.preventDefault()}>
-                    <FilePenIcon />
-                    Rename
-                  </MenubarItem>
-                  <MenubarItem onSelect={(e) => e.preventDefault()}>
+                  <RenameDialog documentId={data._id} initialTitle={data.title}>
+                    <MenubarItem onClick={(e) => e.stopPropagation()} onSelect={(e) => e.preventDefault()}>
+                      <FilePenIcon />
+                      Rename
+                    </MenubarItem>
+                  </RenameDialog>
+                  <RemoveDialog documentId={data._id}>
+                  <MenubarItem onClick={(e) => e.stopPropagation()} onSelect={(e) => e.preventDefault()}>
                     <TrashIcon />
                     Remove
                   </MenubarItem>
+                  </RemoveDialog>
                   <MenubarSeparator />
                   <MenubarItem onClick={() => window.print()}>
                     <PrinterIcon />
