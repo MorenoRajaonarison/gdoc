@@ -22,7 +22,7 @@ const InboxMenu = () => {
     const {inboxNotifications} = useInboxNotifications()
     return (
         <DropdownMenu>
-            <DropdownMenuTrigger>
+            <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="relative" size="icon">
                     <BellIcon className="size-5"/>
                     {inboxNotifications.length > 0 && (
