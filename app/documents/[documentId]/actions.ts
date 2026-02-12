@@ -19,11 +19,17 @@ export async function getUsers() {
         organizationId: [(sessionClaims?.o as any)?.id as string]
     })
 
-    const users = res.data.map(user => ({
-        id: user.id,
-        name: user.fullName ?? user.primaryEmailAddress?.emailAddress ?? "Anonymous",
-        avatar: user.imageUrl
-    }))
+    const users = res.data.map(user => {
+        const name = user.fullName ?? user.primaryEmailAddress?.emailAddress ?? "Anonymous"
+        const nameToNumber = name.split("").reduce((acc, word) => acc + word.charCodeAt(0), 0)
+        const color = `hsl(${nameToNumber % 360}, 100%, 50%)`
+        return {
+            id: user.id,
+            name,
+            avatar: user.imageUrl,
+            color
+        }
+    })
 
     return users
 }
